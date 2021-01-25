@@ -1,7 +1,9 @@
-from utils import f, df
+from first_order_algorithm.fun_grad import f, df
 import numpy as np
+from numba import njit
 
 
+@njit()
 def armijo_step(x, d, sigma, beta):
     """
     determine step size
@@ -15,4 +17,3 @@ def armijo_step(x, d, sigma, beta):
         tau *= beta
         diff = f(x + tau * d) - f(x)
     return tau, count
-

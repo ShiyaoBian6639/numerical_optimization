@@ -1,24 +1,16 @@
 import numpy as np
-from utils import f, df
-from line_search import armijo_step
+from first_order_algorithm.utils import contour_plot, steepest_descent
 
-x = np.array([190.0, 270.0])
-x = np.array([0.0, 0.0])
+x = np.array([10.0, 10.0])
+# x = np.array([0.0, 0.0])
 eps, sigma, beta = 1e-4, 0.5, 0.5
 
+res, descent_step, line_search_step, x_list, y_list = steepest_descent(x, 0.0001, 0.5, 0.5)
+x_arr = np.array(x_list)
+x_range = [8, 15]
+y_range = [2, 12]
+levels = np.arange(0, 20, 2) ** 2
+title = 'Start from [10, 10], armijo takes 35 steps to converge within 1e-4'
+contour_plot(0.5, x_range, y_range, x_arr, levels, title)
 
-def steepest_descent(x, eps, sigma, beta):
-    d = -df(x)  # compute the gradient of f at initial point x
-    descent_iter = 0
-    step_size_iter = 0
-    while np.linalg.norm(d) > eps:
-        descent_iter += 1
-        step_size, armi_iter = armijo_step(x, d, sigma, beta)
-        print(step_size)
-        step_size_iter += armi_iter
-        x += step_size * d
-        d = -df(x)
-    return x, descent_iter, step_size_iter
-
-
-res, descent, step = steepest_descent(x, 0.0001, 0.5, 0.5)
+y_arr = np.array(y_list)

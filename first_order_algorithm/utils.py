@@ -9,29 +9,49 @@ Linear approximation:
 Suppose that f is differentiable and \partial f(x) \neq 0
 Then we have linear approximation for all delta x \neq 0: f(x + \delta x) \approx f(x) + \partial f(x)^T \
 """
-
+from first_order_algorithm.line_search import armijo_step
 import numpy as np
 from numba import njit
-import sympy as sym
+import matplotlib.pyplot as plt
+from first_order_algorithm.fun_grad import f, df
 
 
-def f(x):
-    return (x[0] - 3) ** 2 + (x[1] - 2) ** 2
+def steepest_descent(x, eps, sigma, beta):
+    d = -df(x)  # compute the gradient of f at initial point x
+    descent_iter = 0
+    step_size_iter = 0
+    x_list = [x.copy()]
+    y_list = [f(x)]
+    while np.linalg.norm(d) > eps:
+        descent_iter += 1
+        step_size, armi_iter = armijo_step(x, d, sigma, beta)
+        step_size_iter += armi_iter
+        x += step_size * d
+        x_list.append(x.copy())
+        y_list.append(f(x))
+        d = -df(x)
+    return x, descent_iter, step_size_iter, x_list, y_list
 
 
-def df(x):
-    return np.array([2 * (x[0] - 3), 2 * (x[1] - 2)])
+def contour_plot(delta, x_range, y_range, x_arr, levels, title):
+    x1 = np.arange(x_range[0], x_range[1], delta)
+    x2 = np.arange(y_range[0], y_range[1], delta)
+    X1, X2 = np.meshgrid(x1, x2)
+    Y = evaluate_mesh(X1, X2)
+    fig, ax = plt.subplots()
+    CS = ax.contour(X1, X2, Y, levels=levels)
+    ax.scatter(x_arr[:, 0], x_arr[:, 1], s=1)
+    ax.plot(x_arr[:, 0], x_arr[:, 1], color='red')
+    ax.clabel(CS, inline=1, fontsize=10)
+    ax.set_title(title)
+    fig.show()
 
 
-def f(x):
-    return (11 - x[0] - x[1]) ** 2 + (1 + x[0] + 10 * x[1] - x[0] * x[1]) ** 2
-
-
-def df(x):
-    return np.array([-2 * (11 - x[0] - x[1]) + 2 * (1 + x[0] + 10 * x[1] - x[0] * x[1]) * (1 - x[1]),
-                     -2 * (11 - x[0] - x[1]) + 2 * (1 + x[0] + 10 * x[1] - x[0] * x[1]) * (10 - x[0])])
-# def symbolic function
-# x1, x2 = sym.symbols('x1, x2')
-# f = (x1 - 3) ** 2 + (x2 - 3) ** 2
-# df1 = sym.diff(f, x1)
-# df2 = sym.diff(f, x2)
+@njit()
+def evaluate_mesh(X1, X2):
+    n, m = X1.shape
+    Y = np.zeros((n, m))
+    for i in range(n):
+        for j in range(m):
+            Y[i, j] = f([X1[i, j], X2[i, j]])
+    return Y
