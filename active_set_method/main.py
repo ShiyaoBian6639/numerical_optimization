@@ -1,14 +1,11 @@
-from active_set_method.utils import qp_econ, get_econ
+from active_set_method.utils import active_set_method
 import numpy as np
 
-Q = np.eye(3) * 2  # quadratic coefficient
+q = np.eye(3) * 2  # quadratic coefficient
 p = np.array([-2.0, 2.0, 0.0])  # linear coefficient
-inv_q = np.linalg.inv(Q)
+inv_q = np.linalg.inv(q)
 
 x = np.array([0.0, 1.0, 0.0])  # initial solution
 a = np.array([[1.0, 1.0, 1.0]])
-active_set, a, b = get_econ(a, x)  # active set of current solution
+active_set_method(q, p, x, a)
 
-
-sub_p = p + np.dot(Q, x)  # solve sub problem
-d, u = qp_econ(inv_q, sub_p, a, b)

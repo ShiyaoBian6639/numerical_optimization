@@ -8,6 +8,13 @@ def get_active_set(x):
     return np.where(x == 0)[0]
 
 
+def get_active_set_bool(active_set, x):
+    n = len(x)
+    active_set_bool = np.zeros(n, dtype=int)
+    active_set_bool[active_set] = 1
+    return active_set_bool
+
+
 def get_econ(a, x):
     num_var = len(x)
     active_set = get_active_set(x)
@@ -23,7 +30,7 @@ def get_econ(a, x):
 
 def qp_econ(inv_q, p, a, b):
     """
-    solves equality constrained quadratic program
+    solves equality constrained quadratic program (naive method)
     :param inv_q:
     :param p:
     :param a:
@@ -35,3 +42,70 @@ def qp_econ(inv_q, p, a, b):
     d = -np.dot(inv_q, p) + np.dot(np.dot(np.dot(inv_q, a.T), large_factor), rhs)
     u = -np.dot(large_factor, rhs)
     return d, u
+
+
+def get_max_multiplier(u, num_con):
+    """
+    :param u: multiplier
+    :param num_con: number of constraints
+    :return: the index of the largest multiplier, -1 indicates the active set algorithm to terminate
+    """
+    max_multiplier = -np.inf
+    max_index = -1
+    for i in range(num_con, len(u)):
+        val = u[i]
+        if val > 0 and val > max_multiplier:
+            max_multiplier = val
+            max_index = i
+    return max_index - num_con
+
+
+def drop_active_set(active_set, a, b, index, num_cons, active_set_bool):
+    active_set = np.delete(active_set, index)
+    a = np.delete(a, index + num_cons, 0)
+    b = np.delete(b, index + num_cons)
+    active_set_bool[index] = 0
+    return active_set, a, b, active_set_bool
+
+
+def compute_step_length(x, d, active_set_bool):
+    step_length = np.inf
+    for i in range(len(d)):
+        if active_set_bool[i] == 0 and d[i] < 0:
+            ratio = - x[i] / d[i]
+            if ratio < step_length:
+                step_length = ratio
+    if step_length > 1:
+        return 1
+    return step_length
+
+
+def active_set_method(q, p, x, a):
+    inv_q = np.linalg.inv(q)
+    num_con = len(a)
+    active_set, a, b = get_econ(a, x)  # active set of current solution
+    active_set_bool = get_active_set_bool(active_set, x)
+    sub_p = p + np.dot(q, x)  # solve sub problem
+    d, u = qp_econ(inv_q, sub_p, a, b)
+    max_multiplier = get_max_multiplier(u, num_con)
+    while True:
+        direction_norm = np.linalg.norm(d)
+        if direction_norm < 1e-4:
+            if max_multiplier < 0:
+                return x
+            else:  # update the active set
+                active_set, a, b, active_set_bool = drop_active_set(active_set, a, b, max_multiplier, num_con,
+                                                                    active_set_bool)
+                d, u = qp_econ(inv_q, sub_p, a, b)  # recompute the direction and multiplier
+                max_multiplier = get_max_multiplier(u, num_con)
+        else:  # compute the step length
+            step_length = compute_step_length(x, d, active_set_bool)
+            x += step_length * d
+            active_set, a, b = get_econ(a, x)  # active set of current solution
+            active_set_bool = get_active_set_bool(active_set, x)
+            sub_p = p + np.dot(q, x)  # solve sub problem
+            d, u = qp_econ(inv_q, sub_p, a, b)
+            max_multiplier = get_max_multiplier(u, num_con)
+
+        stop = direction_norm < 1e-4 and max_multiplier < 0
+        pass
