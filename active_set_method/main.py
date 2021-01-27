@@ -9,7 +9,7 @@ import numpy as np
 
 # large instance test
 
-n = 100
+n = 10
 temp = 10 * np.random.random((n, n))
 q = temp + temp.T
 p = np.random.random(n)
@@ -22,3 +22,4 @@ print(min(x))
 for ind, lst in enumerate(x_list):
     if min(lst) < 0:
         print(f"ind: {ind}, pos: {np.argmin(x_list[ind])}")
+        break

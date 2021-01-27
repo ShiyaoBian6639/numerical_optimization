@@ -58,11 +58,12 @@ def get_max_multiplier(u, num_con):
     :param num_con: number of constraints
     :return: the index of the largest multiplier, -1 indicates the active set algorithm to terminate
     """
+    print(f"u is {u}")
     max_multiplier = -np.inf
     max_index = -1
     for i in range(num_con, len(u)):
         val = u[i]
-        if val > TOLERANCE and val > max_multiplier:
+        if val > 0 and val > max_multiplier:
             max_multiplier = val
             max_index = i
     return max_index - num_con
@@ -71,24 +72,27 @@ def get_max_multiplier(u, num_con):
 # @njit()
 def drop_active_set(active_set, a, b, index, num_cons, active_set_bool):
     if len(active_set) > 0:
+        temp = active_set[index]
         active_set = np.delete(active_set, index)
+        active_set_bool[temp] = 0
     a = np.delete(a, index + num_cons, 0)
     b = np.delete(b, index + num_cons)
-    active_set_bool[index] = 0
     return active_set, a, b, active_set_bool
 
 
 # @njit()
 def compute_step_length(x, d, active_set_bool):
     step_length = np.inf
+    j = -1
     for i in range(len(d)):
         if active_set_bool[i] == 0 and d[i] < -TOLERANCE and x[i] > TOLERANCE:
             ratio = - x[i] / d[i]
             if ratio < step_length:
                 step_length = ratio
+                j = i
     if step_length > 1.0:
-        return 1.0
-    return my_floor(step_length, 12)
+        return 1.0, j
+    return my_floor(step_length, 12), j
 
 
 def my_floor(a, precision=0):
@@ -135,7 +139,7 @@ def active_set_method(q, p, x, a):
                 single_d_list.append(step_count)
                 max_multiplier = get_max_multiplier(u, num_con)
         else:  # compute the step length
-            step_length = compute_step_length(x, d, active_set_bool)
+            step_length, append_index = compute_step_length(x, d, active_set_bool)
             print(f"step length is {step_length}")
             x += step_length * d
             # if min(x) < 0:
