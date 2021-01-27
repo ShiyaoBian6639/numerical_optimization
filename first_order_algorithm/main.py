@@ -3,7 +3,7 @@ from first_order_algorithm.utils import contour_plot, steepest_descent
 
 x = np.array([10.0, 10.0])
 # x = np.array([0.0, 0.0])
-eps, sigma, beta = 1e-4, 0.5, 0.5
+eps, sigma, beta = 1e-4, 0.01, 0.9
 
 res, descent_step, line_search_step, x_list, y_list = steepest_descent(x, eps, sigma, beta)
 x_arr = np.array(x_list)

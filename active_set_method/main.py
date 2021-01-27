@@ -16,4 +16,9 @@ p = np.random.random(n)
 x = np.random.random(n)
 x = x / x.sum()
 a = np.ones((1, n))
-active_set_method(q, p, x, a)
+x, cnt, x_list, step_list, d_list, single_list = active_set_method(q, p, x, a)
+print(min(x))
+
+for ind, lst in enumerate(x_list):
+    if min(lst) < 0:
+        print(f"ind: {ind}, pos: {np.argmin(x_list[ind])}")
