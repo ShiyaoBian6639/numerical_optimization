@@ -2,9 +2,9 @@
 Active set method  solves linearly  constrained  general quadratic program
 """
 import numpy as np
-from numba import njit
+from numba import njit, int64
 
-TOLERANCE = 1e-4
+TOLERANCE = 1e-10
 
 
 def generate_random_instance(n):
@@ -24,12 +24,12 @@ def read_qp_instance():
     return q, p, x
 
 
-# @njit()
+#@njit()
 def get_active_set(x, tol):
     return np.where(np.abs(x) < tol)[0]
 
 
-# @njit()
+#@njit()
 def get_active_set_bool(active_set, x):
     n = len(x)
     active_set_bool = np.zeros(n)
@@ -37,7 +37,7 @@ def get_active_set_bool(active_set, x):
     return active_set_bool
 
 
-# @njit()
+#@njit()
 def get_econ(a, x):
     num_var = len(x)
     active_set = get_active_set(x, TOLERANCE)
@@ -51,7 +51,7 @@ def get_econ(a, x):
     return active_set, equal_con, b
 
 
-# @njit()
+#@njit()
 def qp_econ(inv_q, p, a, b):
     """
     solves equality constrained quadratic program (naive method)
@@ -61,8 +61,6 @@ def qp_econ(inv_q, p, a, b):
     :param b:
     :return: direction d and multiplier u
     """
-    print(f"len(a) is {len(a)}")
-    print(a)
     large_factor = np.linalg.inv(np.dot(np.dot(a, inv_q), a.T))
     rhs = b + np.dot(np.dot(a, inv_q), p)
     d = -np.dot(inv_q, p) + np.dot(np.dot(np.dot(inv_q, a.T), large_factor), rhs)
@@ -70,7 +68,7 @@ def qp_econ(inv_q, p, a, b):
     return d, u
 
 
-# @njit()
+#@njit()
 def get_max_multiplier(u, num_con, active_set, active_set_bool):
     """
     :param u: multiplier
@@ -90,7 +88,7 @@ def get_max_multiplier(u, num_con, active_set, active_set_bool):
     return max_index - num_con
 
 
-# @njit()
+#@njit()
 def drop_active_set(active_set, a, b, index, num_cons, active_set_bool):
     print(index)
     len_active_set = len(active_set)
@@ -98,11 +96,12 @@ def drop_active_set(active_set, a, b, index, num_cons, active_set_bool):
         temp = active_set[index]
         active_set = drop_element(active_set, index)
         active_set_bool[temp] = 0
-    a = drop_element(a, index)
+    a = drop_element(a, index + num_cons)
     b = drop_element(b, index + num_cons)
     return active_set, a, b, active_set_bool
 
 
+#@njit()
 def drop_element(arr, ind):
     """
     remove ind-th element from arr, depending on the shape of arr
@@ -133,6 +132,7 @@ def drop_element(arr, ind):
         return new_arr
 
 
+#@njit()
 def append_active_set(active_set, a, b, index, active_set_bool):
     if len(active_set) > 0:
         len_active_set = len(active_set)
@@ -149,7 +149,7 @@ def append_active_set(active_set, a, b, index, active_set_bool):
     return new_active_set, a, b, active_set_bool
 
 
-# @njit()
+#@njit()
 def compute_step_length(x, d, active_set_bool):
     step_length = np.inf
     j = -1
@@ -164,6 +164,7 @@ def compute_step_length(x, d, active_set_bool):
     return my_floor(step_length, 12), j
 
 
+#@njit()
 def my_floor(a, precision=0):
     """
     helper function to round 3.1415926 down to 3.1415, differs with np.round
@@ -174,6 +175,7 @@ def my_floor(a, precision=0):
     return np.round(a - 0.5 * 10 ** (-precision), precision)
 
 
+#@njit()
 def active_set_method(q, p, x, a):
     eig_val, eig_mat = np.linalg.eig(q)
     if min(eig_val) < 0:

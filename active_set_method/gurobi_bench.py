@@ -23,13 +23,12 @@ from active_set_method.utils import read_qp_instance
 from gurobipy import GRB, Model
 import numpy as np
 
-
 q, p, x = read_qp_instance()
 n = len(x)
 
 m = Model('portfolio')
 A = np.ones(n)
 x = m.addMVar(n, lb=0.0)
-m.setObjective(x @ q @ x, GRB.MINIMIZE)
+m.setObjective(x @ q @ x + p @ x, GRB.MINIMIZE)
 m.addConstr(A @ x == 1)
 m.optimize()

@@ -10,10 +10,14 @@ from gurobipy import Model, GRB
 
 # large instance test
 
-n = 10
+n = 100
 q, p, x = generate_random_instance(n)
 q = q + 2 * np.eye(n)
-
+x = np.random.random(n)
 x = x / x.sum()
 a = np.ones((1, n))
 x, cnt, = active_set_method(q, p, x, a)
+
+for i in range(n):
+    if abs(x[i] > 1e-8):
+        print(f"x[{i}] = {x[i]}")
