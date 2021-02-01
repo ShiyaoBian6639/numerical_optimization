@@ -19,15 +19,17 @@
 # packages aren't included in all Python distributions, but are
 # included by default with Anaconda Python.
 
-import gurobipy as gp
-from gurobipy import GRB
-from math import sqrt
-import pandas as pd
+from active_set_method.utils import read_qp_instance
+from gurobipy import GRB, Model
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
 
-vars = pd.Series(m.addVars(stocks), index=stocks)
+q, p, x = read_qp_instance()
+n = len(x)
 
+m = Model('portfolio')
+A = np.ones(n)
+x = m.addMVar(n, lb=0.0)
+m.setObjective(x @ q @ x, GRB.MINIMIZE)
+m.addConstr(A @ x == 1)
+m.optimize()

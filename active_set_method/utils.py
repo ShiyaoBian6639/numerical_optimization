@@ -7,6 +7,23 @@ from numba import njit
 TOLERANCE = 1e-4
 
 
+def generate_random_instance(n):
+    q = np.cov(10 * np.random.random((n, 2)))
+    p = np.random.random(n)
+    x = np.random.random(n)
+    np.savetxt('../data/q.txt', q)
+    np.savetxt('../data/p.txt', p)
+    np.savetxt('../data/x.txt', x)
+    return q, p, x
+
+
+def read_qp_instance():
+    q = np.loadtxt('./data/q.txt')
+    p = np.loadtxt('./data/p.txt')
+    x = np.loadtxt('./data/x.txt')
+    return q, p, x
+
+
 # @njit()
 def get_active_set(x, tol):
     return np.where(np.abs(x) < tol)[0]
@@ -73,13 +90,44 @@ def get_max_multiplier(u, num_con, active_set, active_set_bool):
 
 # @njit()
 def drop_active_set(active_set, a, b, index, num_cons, active_set_bool):
-    if len(active_set) > 0:
+    len_active_set = len(active_set)
+    if len_active_set > 0:
         temp = active_set[index]
-        active_set = np.delete(active_set, index)
+        active_set = drop_element(active_set, index)
         active_set_bool[temp] = 0
-    a = np.delete(a, index + num_cons, 0)
-    b = np.delete(b, index + num_cons)
+    a = drop_element(a, index)
+    b = drop_element(b, index + num_cons)
     return active_set, a, b, active_set_bool
+
+
+def drop_element(arr, ind):
+    """
+    remove ind-th element from arr, depending on the shape of arr
+    if arr has dim 1, the ind-th element is removed
+    if arr has dim 2, the ind-th row is removed
+    :param arr: input array of dim 1 or 2
+    :param ind: the index to be removed
+    :return: new arr with ind-th element removed from arr
+    """
+    n = len(arr)
+    if arr.ndim == 1:
+        new_arr = np.zeros(n - 1, dtype=int)
+        count = 0
+        for i in range(n):
+            if i != ind:
+                new_arr[count] = arr[i]
+                count += 1
+        return new_arr
+
+    if arr.ndim == 2:
+        m = arr.shape[1]
+        new_arr = np.zeros((n - 1, m))
+        count = 0
+        for i in range(n):
+            if i != ind:
+                new_arr[count, :] = arr[i]
+                count += 1
+        return new_arr
 
 
 def append_active_set(active_set, a, b, index, active_set_bool):
@@ -123,58 +171,11 @@ def my_floor(a, precision=0):
     return np.round(a - 0.5 * 10 ** (-precision), precision)
 
 
-# @njit()
 def active_set_method(q, p, x, a):
-    original_constraint = a.copy()
-    inv_q = np.linalg.inv(q)
-    num_con = len(a)
-    active_set, a, b = get_econ(original_constraint, x)  # active set of current solution
-    active_set_bool = get_active_set_bool(active_set, x)
-    sub_p = p + np.dot(q, x)  # solve sub problem
-    d, u = qp_econ(inv_q, sub_p, a, b)
-    max_multiplier = get_max_multiplier(u, num_con, active_set, active_set_bool)
-    step_count = 0
-    step_length = 0
-    x_list = [x.copy()]
-    step_list = [0]
-    d_list = [d.copy()]
-    single_d_list = []
-    while True:
-        step_count += 1
-        print(f"step_count is {step_count}")
-        direction_norm = np.linalg.norm(d)
-        print(f"direction norm: {direction_norm}")
-        if direction_norm < TOLERANCE:
-            if max_multiplier < 0:
-                return x, step_count, np.array(x_list), np.array(step_list), np.array(d_list), np.array(single_d_list)
-            else:  # update the active set
-                active_set, a, b, active_set_bool = drop_active_set(active_set, a, b, max_multiplier, num_con,
-                                                                    active_set_bool)
-                if len(active_set) != len(b) - num_con:  # check the correspondence between the active set and rhs
-                    print("length of active set does not agree with rhs")
-                    return x, step_count, np.array(x_list), np.array(step_list), np.array(d_list), np.array(
-                        single_d_list)
-                # d, u = qp_econ(inv_q, sub_p, a, b)  # recompute the direction and multiplier
-                # single_d_list.append(step_count)
-                # max_multiplier = get_max_multiplier(u, num_con, active_set, active_set_bool)
-        else:  # compute the step length
-            step_length, append_index = compute_step_length(x, d, active_set_bool)
-            active_set, a, b, active_set_bool = append_active_set(active_set, a, b, append_index, active_set_bool)
-            # append new element "append_index" to the current active set
-            print(f"step length is {step_length}")
-            x += step_length * d
-            obj = np.dot(np.dot(x.T, q), x) + np.dot(p, x)
-            print(obj)
-            sub_p = p + np.dot(q, x)  # solve sub problem
-            d, u = qp_econ(inv_q, sub_p, a, b)
-            max_multiplier = get_max_multiplier(u, num_con, active_set, active_set_bool)
-
-        x_list.append(x.copy())
-        step_list.append(step_length)
-        d_list.append(d.copy())
-
-
-def active_set_method(q, p, x, a):
+    eig_val, eig_mat = np.linalg.eig(q)
+    if min(eig_val) < 0:
+        print("problem is not positive semidefinite")
+        return 0, 0
     original_constraint = a.copy()
     inv_q = np.linalg.inv(q)
     num_con = len(a)
