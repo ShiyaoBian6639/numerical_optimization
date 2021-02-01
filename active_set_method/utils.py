@@ -11,9 +11,9 @@ def generate_random_instance(n):
     q = np.cov(10 * np.random.random((n, 2)))
     p = np.random.random(n)
     x = np.random.random(n)
-    np.savetxt('../data/q.txt', q)
-    np.savetxt('../data/p.txt', p)
-    np.savetxt('../data/x.txt', x)
+    # np.savetxt('../data/q.txt', q)
+    # np.savetxt('../data/p.txt', p)
+    # np.savetxt('../data/x.txt', x)
     return q, p, x
 
 
@@ -61,6 +61,8 @@ def qp_econ(inv_q, p, a, b):
     :param b:
     :return: direction d and multiplier u
     """
+    print(f"len(a) is {len(a)}")
+    print(a)
     large_factor = np.linalg.inv(np.dot(np.dot(a, inv_q), a.T))
     rhs = b + np.dot(np.dot(a, inv_q), p)
     d = -np.dot(inv_q, p) + np.dot(np.dot(np.dot(inv_q, a.T), large_factor), rhs)
@@ -90,6 +92,7 @@ def get_max_multiplier(u, num_con, active_set, active_set_bool):
 
 # @njit()
 def drop_active_set(active_set, a, b, index, num_cons, active_set_bool):
+    print(index)
     len_active_set = len(active_set)
     if len_active_set > 0:
         temp = active_set[index]
