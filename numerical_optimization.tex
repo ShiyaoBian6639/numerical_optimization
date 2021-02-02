@@ -42,114 +42,32 @@
         \lambda_i^*c_i(x*) = 0 & \qquad \forall i \in\mathcal{E}\cup\mathcal{I} \tag{12.34e} \label{KKT: complementary}
     \end{align}
 
-
+    \section{Fundamentals of Constrained Optimization} \label{sec: chap15}
+    \subsection{General Reduction Strategies for Linear Constraints} \label{subsec:-reduction-linear-constraints}
+    We choose matrices $Y\in\mathcal{R}^{n\times m}$ and $Z\in\mathcal{R}^{n\times (n - m)}$
+    with the following properties:
+    \begin{align}
+        [Y|Z]\in\mathcal{R}^{n\times n} \text{ is non-singular } , \quad AZ = 0 \tag{15.16}\label{chap15: partition}
+    \end{align}
+    Since $A$ has full row rank, so does $A[Y|Z] = [AY|0]$, so it follows that the $m\times m$ matrix $AY$
+    is non-singular.We now express any solution of the linear constraints $Ax = b$ as
+    \begin{align}
+        x = Yx_Y + Zx_Z \tag{15.17}\label{eqn: 15.17}
+    \end{align}
+    By substituting\eqref{eqn: 15.17} into the constraints $Ax = b$, we obtain
+    \begin{align*}
+        Ax = (AY)x_Y = b
+    \end{align*}
+    hence, by non-singularity of $AY, x_Y$ can be written explicitly as
+    \begin{align}
+        x_Y = (AY)^{-1}b \tag{15.18}\label{eqn: 15.18}
+    \end{align}
+    We conclude that any vector $x$ of the form
+    \begin{align}
+        x = Y(AY)^{-1}b + Zx_Z \tag{15.19}\label{eqn: 15.19}
+    \end{align}
+    satisfies the constraints $Ax = b$ for any choices of $x_Z\in\mathcal{R}^{n-m}$
     \section{Active Set Method} \label{sec:asm}
-    Active set method solves general quadratic program (QP) in the following form:
-    \begin{subequations}
-        \label{prob: qp}
-        \begin{align}
-            \min_x q(x) = &\frac{1}{2} x^TGx + x^Tc \tag{16.1a}   \label{exp: qp_obj} \\
-            \text{subject to \quad}  &a_i^Tx = b_i, i \in \mathcal{E} \tag{16.1b} \label{con: equality} \\
-            &a_i^Tx \geq b_i, i \in \mathcal{I}  \tag{16.1c} \label{con: inequality}
-%        \label{prob: 16.1}
-        \end{align}
-    \end{subequations}
-
-
-    where $G$ is a symmetric $n\times n$ matrix, $\mathcal{E}$ and $\mathcal{I}$ are finite sets of indices, and $c, x$ and
-    $\{a_i\}, i\in\mathcal{E}\cup\mathcal{I}$ are vectors in $\mathbb{R}^n$.
-    We say that problem\eqref{prob: qp} is convex if matrix $G$ is positive semi definite.
-
-    \subsection{Equality constrained Quadratic Programs} \label{subsec:-ec_qp}
-    \begin{subequations}
-        \label{prob: ec_qp}
-        \begin{align}
-            \min_x q(x) = &\frac{1}{2} x^TGx + x^Tc \tag{16.3a}   \label{exp: ec_qp_obj} \\
-            \text{subject to \quad}  &Ax = b \tag{16.3b} \label{con: ec_qp}
-        \end{align}
-    \end{subequations}
-    where A is the $m\times n$ matrix whose rows are $a_i^T, i\in\mathcal{E}$ and $b$ is the vector in $\mathcal{R}^m$
-    whose components are $b_i, i\in\mathcal{I}$.\\
-    The Lagrangian function of (16.3) is:
-    \begin{align*}
-        \mathcal{L}(x^*, \lambda^*) = \frac{1}{2} x^TGx + x^Tc - \lambda^{*T}(Ax - b)
-    \end{align*}
-    The first order necessary condition for $x^*$ to be a solution of(16.3) states that there is a vector $\lambda^*$
-    such that:
-    \begin{align*}
-        Gx^* + c - A^T\lambda^* = 0\\
-        Ax^* = b
-    \end{align*}
-
-    In matrix form:
-    \[
-        \begin{bmatrix}
-            &G & -A^T& \\
-            &A & 0&
-        \end{bmatrix}
-        \begin{bmatrix}
-            &x^*&\\
-            &\lambda^*&
-        \end{bmatrix} =
-        \begin{bmatrix}
-            &-c&\\
-            &b&
-        \end{bmatrix}\tag{16.4} \label{KKT: original matrix}
-    \]
-
-    Suppose that the search direction is $p$ and $x^* = x + p $, the KKT condition becomes
-    \begin{align*}
-        G(x + p) + c - A^T\lambda^* = 0\\
-        A(x + p) = b
-    \end{align*}
-
-    Rearranging the equations, we obtain
-
-    \[
-        \begin{bmatrix}
-            &G & -A^T& \\
-            &A & 0&
-        \end{bmatrix}
-        \begin{bmatrix}
-            &-p&\\
-            &\lambda^*&
-        \end{bmatrix} =
-        \begin{bmatrix}
-            &g&\\
-            &h&
-        \end{bmatrix}\tag{16.5} \label{KKT: step matrix}
-    \]
-
-    where
-    \begin{align}
-        h = Ax -b,  \quad g = c + Gx, \quad p = x^* - x \tag{16.6}\label{KKT: transform}
-    \end{align}
-    The matrix in \eqref{KKT: step matrix} is called the KKT matrix and lemma 16.1 gives that
-    \[
-        K =
-        \begin{bmatrix}
-            &G & -A^T& \\
-            &A & 0&
-        \end{bmatrix}
-    \]
-    is non-singular.
-    Z denotes the $n\times(n -m)$ matrix whose columns are a basis for the null space of A. That is
-    Z has full rank and satisfies $AZ = 0$
-
-    \subsection{Direct Solution of the KKT System} \label{subsec:-direct-solution-KKT}
-
-    \subsubsection{Symmetric indefinite factorization} \label{subsubsec:-symmetric-indefinite-factorization}
-    \begin{align}
-        P^TKP = LBL^T \tag{16.12} \label{eqn: symmetric-indefinite-factorization}
-    \end{align}
-
-    \subsection{Schur-Complement Method} \label{subsec:-schur-complement-method}
-
-    \subsection{Null-Space Method} \label{subsec:-null-space-method}
-    The null space method does not require non-singularity of G and therefore has wider applicability than the
-    Schur-complement method.It assumes only that $A$ has full row rank and that $Z^TGZ$ is positive definite.However,
-    it requires knowledge of the null-space basis matrix Z. Like the Schur-complement method, it exploits the block
-    structure in the KKT system to decouple\eqref{KKT: step matrix} into two smaller systems.
-
+    \input{active-set-method}
 
 \end{document}
