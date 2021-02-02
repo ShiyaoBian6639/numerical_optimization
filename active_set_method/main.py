@@ -1,5 +1,6 @@
 from active_set_method.utils import active_set_method, generate_random_instance
 import numpy as np
+from active_set_method.utils import plot_obj
 from gurobipy import Model, GRB
 
 # q = np.eye(3) * 2  # quadratic coefficient
@@ -10,14 +11,15 @@ from gurobipy import Model, GRB
 
 # large instance test
 
-n = 100
+n = 500
 q, p, x = generate_random_instance(n)
 q = q + 2 * np.eye(n)
 x = np.random.random(n)
 x = x / x.sum()
 a = np.ones((1, n))
-x, cnt, = active_set_method(q, p, x, a)
+x, cnt, obj_list = active_set_method(q, p, x, a)
 
-for i in range(n):
-    if abs(x[i] > 1e-8):
-        print(f"x[{i}] = {x[i]}")
+plot_obj(obj_list)
+# for i in range(n):
+#     if abs(x[i] > 1e-8):
+#         print(f"x[{i}] = {x[i]}")
