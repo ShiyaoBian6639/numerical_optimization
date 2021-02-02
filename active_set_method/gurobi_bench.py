@@ -19,12 +19,12 @@
 # packages aren't included in all Python distributions, but are
 # included by default with Anaconda Python.
 
-from active_set_method.utils import read_qp_instance
+from active_set_method.utils import generate_random_instance
 from gurobipy import GRB, Model
 import numpy as np
 
-q, p, x = read_qp_instance()
-n = len(x)
+n = 5000
+q, p, x = generate_random_instance(n)
 
 m = Model('portfolio')
 A = np.ones(n)
