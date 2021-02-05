@@ -1,0 +1,50 @@
+\subsection{Primal-Dual-Methods} \label{subsec:-primal-dual-methods}
+We consider the linear programming problem in standard form:
+\[
+    \min c^T x, \text{ subject to } Ax = b, x \geq 0 \tag{14.1}\label{lp: 14.1}
+\]
+where $c$ and $x$ are vectors in $\mathcal{R}^n$, $b$ is a vector in $\mathcal{R}^m$, and A is an
+$m\times n$ matrix with full row rank. (As in Chapter 13, Pre-processing the problem to remove dependent rows from A
+is necessary).The dual problem for\ref{lp: 14.1} is
+\[
+    \max b^T \lambda, \text{ subject to } A^T \lambda + s = c, s\geq 0 \tag{14.2}\label{dual: 14.2}
+\]
+where $\lambda$ is a vector in $\mathcal{R}^m$, and $s$ is a vector in $\mathcal{R}^n$.Solutions of\eqref{lp: 14.1}
+and\eqref{dual: 14.2} are characterized by the KKT conditions:
+
+\begin{align}
+    A^T\lambda + s &= c \tag{14.3a}\label{KKT: 14.3a}\\
+    Ax & = b \tag{14.3b}\label{KKT: 14.3b}\\
+    x_i s_i & = 0, \quad i = 1,2,\cdots, n \tag{14.3c} \label{KKT: 14.3c}\\
+    (x, s) & \geq 0 \tag{14.3d}\label{KKT: 14.3d}
+\end{align}
+
+Primal-dual method find solutions $(x^*, \lambda^*, s^*)$ of this system by applying variants of Newton's method to the
+three equalities in (14.3) and modifying the search directions and step lengths so that the inequalities
+$(x, s) \geq 0$ are satisfied strictly at every iteration.The equations\eqref{KKT: 14.3a},\eqref{KKT: 14.3b}
+,\eqref{KKT: 14.3c} are linear or only mildly nonlinear and so are not difficult to solve by themselves.However, the problem
+becomes much more difficult when we add the non-negativity requirement\eqref{KKT: 14.3d}
+\par To derive primal-dual interior-point methods we restate the optimality conditions (14.3) in a slightly different form
+by means of a mapping $F$ from $\mathbb{R}^{2n + m}$ to $\mathbb{R}^{2n + m}$
+\begin{align}
+    F(x, \lambda, s) =
+    \begin{bmatrix}
+        A^T\lambda + s - c\\
+        Ax - b \\
+        XSe
+    \end{bmatrix} = 0 \tag{14.4a}\label{KKT: 14.4a}\\
+    (x, s) \tag{14.4b} \label{KKT:14.4b}\geq 0
+\end{align}
+where
+\[
+    X = diag(x_1, x_2,\cdots,x_n), \qquad S = diag(s_1, s_2, \cdots, s_n) \tag{14.5}\label{KKT: 14.5}
+\]
+and $e = (1,1,\cdots, 1)^T$.Primal-dual methods generate iterates $x^k, \lambda^k, s^k $ that satisfy the
+bounds\eqref{KKT:14.4b} strictly, that is $x^k \geq 0$ and $s^k \geq 0$.This property is the origin of the term
+interior-point.The primal-dual interior point methods have two basic ingredients: a procedure for determining the step
+and a measure of desirability of each point in the search space.An important component of hte measure of desirability
+is the average value of the pairwise products $x_i s_i ,i = 1,2,\cdots ,n $ which are all positive when $x > 0$ and $s > 0$.
+This quantity is known as the duality measure and is defined as follows:
+\[
+    \mu = \frac{1}{n} \sum_{i=1}^n x_i s_i = \frac{x^T s}{n} \tag{14.6} \label{ipm: 14.6}
+\]

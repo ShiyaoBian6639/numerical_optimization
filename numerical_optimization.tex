@@ -7,6 +7,13 @@
 % Packages
 \usepackage{amsmath}
 \usepackage{amsfonts}
+%\usepackage{geometry}
+%\geometry{
+%    a4paper,
+%    total={170mm,257mm},
+%    left=20mm,
+%    top=20mm,
+%}
 \usepackage{CJK}
 \input zhwinfonts
 % Document
@@ -14,62 +21,14 @@
 %    \begin{CJK}{UTF8}{song}
 %        中文在这里
 %    \end{CJK}
-    \section{Theory of Constrained Optimization} \label{sec: theory_cons_opt}
-    General constrained optimization problems can be formulated as:
-    \begin{subequations}
-        \begin{align*}
-            \min_{x\in\mathcal{R}^n} &f(x) \tag{12.1} \label{prob: cons_opt}\\
-            \text{subject to: } &c_i(x) = 0, i\in\mathcal{I}\\
-            &c_i(x) \geq 0, i\in\mathcal{E}
-        \end{align*}
-    \end{subequations}
-
-    The Lagrangian function for the general constrained optimization problem\eqref{prob: cons_opt}:
-    \begin{align}
-        \mathcal{L}(x, \lambda) = f(x) - \sum_{i\in\mathcal{E}\cup\mathcal{I}} \lambda_i c_i(x) \tag{12.33} \label{Lag: general_cons_opt}
-    \end{align}
-
-    Theorem 12.1 First-Order Necessary conditions:\\
-    Suppose that $x^*$ is a local solution of\eqref{prob: cons_opt}, that the functions $f$ and $c_i$ in\eqref{prob: cons_opt}
-    are continuously differentiable, and that the LICQ holds at $x^*$.Then there is a Lagrangian multiplier vector $\lambda*$
-    with components $\lambda_i*, i\in\mathcal{E}\cup\mathcal{I}$ such that the following conditions are satisfied at $(x*, \lambda*)$
-
-    \begin{align}
-        \nabla_x \mathcal{L}(x*, \lambda*) = 0& \tag{12.34a} \label{KKT: derivative}\\
-        c_i(x*) = 0 & \qquad \forall i\in\mathcal{E} \tag{12.34b} \label{KKT: equality}\\
-        c_i(x*) \geq 0 & \qquad \forall i\in\mathcal{I} \tag{12.34c} \label{KKT: inequality}\\
-        \lambda_i* \geq 0 & \qquad \forall i\in\mathcal{I} \tag{12.34d} \label{KKT: multiplier}\\
-        \lambda_i^*c_i(x*) = 0 & \qquad \forall i \in\mathcal{E}\cup\mathcal{I} \tag{12.34e} \label{KKT: complementary}
-    \end{align}
-
+    \section{Theory of Constrained Optimization} \label{sec: chap12}
+    \input{theory-of-constrained-optimization.tex}
+    \section{Interior Point Method} \label{sec: chap14}
+    \input{interior-point-method.tex}
     \section{Fundamentals of Constrained Optimization} \label{sec: chap15}
-    \subsection{Simple Elimination Using Linear Constraints} \label{subsec:-elimination-linear-constraints}
+    \input{fundamentals-of-constrained-optimization.tex}
 
-    \subsection{General Reduction Strategies for Linear Constraints} \label{subsec:-reduction-linear-constraints}
-    We choose matrices $Y\in\mathcal{R}^{n\times m}$ and $Z\in\mathcal{R}^{n\times (n - m)}$
-    with the following properties:
-    \begin{align}
-        [Y|Z]\in\mathcal{R}^{n\times n} \text{ is non-singular } , \quad AZ = 0 \tag{15.16}\label{chap15: partition}
-    \end{align}
-    Since $A$ has full row rank, so does $A[Y|Z] = [AY|0]$, so it follows that the $m\times m$ matrix $AY$
-    is non-singular.We now express any solution of the linear constraints $Ax = b$ as
-    \begin{align}
-        x = Yx_Y + Zx_Z \tag{15.17}\label{eqn: 15.17}
-    \end{align}
-    By substituting\eqref{eqn: 15.17} into the constraints $Ax = b$, we obtain
-    \begin{align*}
-        Ax = (AY)x_Y = b
-    \end{align*}
-    hence, by non-singularity of $AY, x_Y$ can be written explicitly as
-    \begin{align}
-        x_Y = (AY)^{-1}b \tag{15.18}\label{eqn: 15.18}
-    \end{align}
-    We conclude that any vector $x$ of the form
-    \begin{align}
-        x = Y(AY)^{-1}b + Zx_Z \tag{15.19}\label{eqn: 15.19}
-    \end{align}
-    satisfies the constraints $Ax = b$ for any choices of $x_Z\in\mathcal{R}^{n-m}$
-    \section{Active Set Method} \label{sec:asm}
+    \section{Active Set Method} \label{sec: chap16}
     \input{active-set-method}
 
 \end{document}

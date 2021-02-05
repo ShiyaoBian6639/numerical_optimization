@@ -11,7 +11,7 @@ from gurobipy import Model, GRB
 
 # large instance test
 
-n = 1000
+n = 500
 q, p, x = generate_random_instance(n)
 q = q + 2 * np.eye(n)
 x = np.random.random(n)

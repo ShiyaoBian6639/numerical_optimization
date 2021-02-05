@@ -1,0 +1,26 @@
+General constrained optimization problems can be formulated as:
+\begin{subequations}
+    \begin{align*}
+        \min_{x\in\mathcal{R}^n} &f(x) \tag{12.1} \label{prob: cons_opt}\\
+        \text{subject to: } &c_i(x) = 0, i\in\mathcal{I}\\
+        &c_i(x) \geq 0, i\in\mathcal{E}
+    \end{align*}
+\end{subequations}
+
+The Lagrangian function for the general constrained optimization problem\eqref{prob: cons_opt}:
+\begin{align}
+    \mathcal{L}(x, \lambda) = f(x) - \sum_{i\in\mathcal{E}\cup\mathcal{I}} \lambda_i c_i(x) \tag{12.33} \label{Lag: general_cons_opt}
+\end{align}
+
+Theorem 12.1 First-Order Necessary conditions:\\
+Suppose that $x^*$ is a local solution of\eqref{prob: cons_opt}, that the functions $f$ and $c_i$ in\eqref{prob: cons_opt}
+are continuously differentiable, and that the LICQ holds at $x^*$.Then there is a Lagrangian multiplier vector $\lambda*$
+with components $\lambda_i*, i\in\mathcal{E}\cup\mathcal{I}$ such that the following conditions are satisfied at $(x*, \lambda*)$
+
+\begin{align}
+    \nabla_x \mathcal{L}(x*, \lambda*) = 0& \tag{12.34a} \label{KKT: derivative}\\
+    c_i(x*) = 0 & \qquad \forall i\in\mathcal{E} \tag{12.34b} \label{KKT: equality}\\
+    c_i(x*) \geq 0 & \qquad \forall i\in\mathcal{I} \tag{12.34c} \label{KKT: inequality}\\
+    \lambda_i* \geq 0 & \qquad \forall i\in\mathcal{I} \tag{12.34d} \label{KKT: multiplier}\\
+    \lambda_i^*c_i(x*) = 0 & \qquad \forall i \in\mathcal{E}\cup\mathcal{I} \tag{12.34e} \label{KKT: complementary}
+\end{align}

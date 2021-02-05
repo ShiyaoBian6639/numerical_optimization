@@ -1,0 +1,26 @@
+\subsection{Simple Elimination Using Linear Constraints} \label{subsec:-elimination-linear-constraints}
+
+\subsection{General Reduction Strategies for Linear Constraints} \label{subsec:-reduction-linear-constraints}
+We choose matrices $Y\in\mathbb{R}^{n\times m}$ and $Z\in\mathbb{R}^{n\times (n - m)}$
+with the following properties:
+\begin{align}
+[Y|Z]\in\mathbb{R}^{n\times n} \text{ is non-singular } , \quad AZ = 0 \tag{15.16}\label{chap15: partition}
+\end{align}
+Since $A$ has full row rank, so does $A[Y|Z] = [AY|0]$, so it follows that the $m\times m$ matrix $AY$
+is non-singular.We now express any solution of the linear constraints $Ax = b$ as
+\begin{align}
+    x = Yx_Y + Zx_Z \tag{15.17}\label{eqn: 15.17}
+\end{align}
+By substituting\eqref{eqn: 15.17} into the constraints $Ax = b$, we obtain
+\begin{align*}
+    Ax = (AY)x_Y = b
+\end{align*}
+hence, by non-singularity of $AY, x_Y$ can be written explicitly as
+\begin{align}
+    x_Y = (AY)^{-1}b \tag{15.18}\label{eqn: 15.18}
+\end{align}
+We conclude that any vector $x$ of the form
+\begin{align}
+    x = Y(AY)^{-1}b + Zx_Z \tag{15.19}\label{eqn: 15.19}
+\end{align}
+satisfies the constraints $Ax = b$ for any choices of $x_Z\in\mathbb{R}^{n-m}$
