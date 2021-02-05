@@ -4,7 +4,8 @@ Active set method  solves linearly  constrained  general quadratic program
 import numpy as np
 from numba import njit, int64
 from matplotlib import pyplot as plt
-
+from factorization.qr_factorization import qr_fact, qr_update
+from factorization.cholesky_factorization import cholesky_solve
 TOLERANCE = 1e-10
 
 
@@ -67,6 +68,31 @@ def qp_econ(inv_q, p, a, b):
     d = -np.dot(inv_q, p) + np.dot(np.dot(np.dot(inv_q, a.T), large_factor), rhs)
     u = -np.dot(large_factor, rhs)
     return d, u
+
+
+def qp_econ_null_space(a, x, b, G, c):
+    """
+    solves equality constrained quadratic program using the null space method
+    :param a: Ax = b, equality constraint coefficient
+    :param x: current solution
+    :param b: Ax = b, rhs of equality constraint
+    :param G: positive semi-definite matrix in the qp objective function
+    :param c: linear objective
+    :return: p the search direction and lmd the lagrangian multiplier
+    """
+    h = a.dot(x) - b
+    g = c + G.dot(x)
+    y, z, r = qr_fact(a)
+    inv_ay = np.linalg.inv(a.dot(y))
+    py = -np.dot(inv_ay, h)
+    pz_rhs = -np.dot(np.dot(np.dot(z.T, G), y), py) - np.dot(z.T, g)
+    pz_lhs = np.dot(np.dot(z.T, G), z)
+    pz = cholesky_solve(pz_lhs, pz_rhs)
+    p = y.dot(py) + z.dot(pz)
+    lmd_left = inv_ay.dot(y.T)
+    lmd_right = g + G.dot(p)
+    lmd = lmd_left.dot(lmd_right)
+    return p, lmd
 
 
 # @njit()
@@ -192,6 +218,7 @@ def active_set_method(q, p, x, a):
     while True:
         sub_p = p + np.dot(q, x)  # solve sub problem
         d, u = qp_econ(inv_q, sub_p, a, b)
+        # d, u = qp_econ_null_space(a, x, b, q, p)
         step_count += 1
         # print(f"step_count is {step_count}")
         direction_norm = np.linalg.norm(d)
@@ -211,6 +238,7 @@ def active_set_method(q, p, x, a):
                 active_set, a, b, active_set_bool = append_active_set(active_set, a, b, append_index, active_set_bool)
 
             obj = 0.5 * np.dot(np.dot(x.T, q), x) + np.dot(p, x)
+            print(obj)
             obj_list.append(obj)
 
 

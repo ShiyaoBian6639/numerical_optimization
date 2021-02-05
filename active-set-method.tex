@@ -135,3 +135,26 @@
         (AY)^T\lambda^* = Y^T(g + Gp) \tag{16.20}\label{eqn: 16.20}\\
         \lambda^* = (AY)^{-1}Y^T(g + Gp)
     \end{align*}
+
+    \subsection{Updating Factorizations} \label{subsec:-updating-factorizations}
+    \[
+        A^T\Pi = Q
+        \begin{bmatrix}
+            & R & \\
+            & 0 &
+        \end{bmatrix} =
+        \begin{bmatrix}
+            & Q_1 & Q_2 &
+        \end{bmatrix}
+        \begin{bmatrix}
+            & R & \\
+            & 0 &
+        \end{bmatrix}\tag{16.50}\label{eqn: 16.50}
+    \]
+    where $\Pi$ is a permutation matrix; $R$ is square, upper triangular and non-singular;
+     $   Q =
+        \begin{bmatrix}
+            & Q_1 & Q_2 &
+        \end{bmatrix}
+    $
+    is $n\times n$ orthogonal and $Q_1, R$ both have $m$ columns while $Q_2$ has $n - m$ columns.
