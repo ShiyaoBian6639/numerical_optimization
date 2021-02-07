@@ -6,6 +6,7 @@ from numba import njit, int64
 from matplotlib import pyplot as plt
 from factorization.qr_factorization import qr_fact, qr_update
 from factorization.cholesky_factorization import cholesky_solve
+
 TOLERANCE = 1e-10
 
 
@@ -83,7 +84,11 @@ def qp_econ_null_space(a, x, b, G, c):
     h = a.dot(x) - b
     g = c + G.dot(x)
     y, z, r = qr_fact(a)
-    inv_ay = np.linalg.inv(a.dot(y))
+    m, n = a.shape
+    if m < n:
+        inv_ay = np.linalg.inv(a.dot(y))
+    else:
+        inv_ay = np.linalg.inv(a.dot(y.T))
     py = -np.dot(inv_ay, h)
     pz_rhs = -np.dot(np.dot(np.dot(z.T, G), y), py) - np.dot(z.T, g)
     pz_lhs = np.dot(np.dot(z.T, G), z)
@@ -218,7 +223,7 @@ def active_set_method(q, p, x, a):
     while True:
         sub_p = p + np.dot(q, x)  # solve sub problem
         d, u = qp_econ(inv_q, sub_p, a, b)
-        # d, u = qp_econ_null_space(a, x, b, q, p)
+        d, u = qp_econ_null_space(a, x, b, q, p)
         step_count += 1
         # print(f"step_count is {step_count}")
         direction_norm = np.linalg.norm(d)

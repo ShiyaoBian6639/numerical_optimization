@@ -48,3 +48,193 @@ This quantity is known as the duality measure and is defined as follows:
 \[
     \mu = \frac{1}{n} \sum_{i=1}^n x_i s_i = \frac{x^T s}{n} \tag{14.6} \label{ipm: 14.6}
 \]
+The procedure for determining the search direction has tis origins in Newton's method for the nonlinear
+equations\eqref{KKT: 14.3a}.
+The search direction $(\Delta x, \Delta \lambda, \Delta s)$ by solving the following system of linear equations:
+\[
+    J(x, \lambda, s)
+    \begin{bmatrix}
+        & \Delta x &\\
+        & \Delta \lambda & \\
+        & \Delta s &
+    \end{bmatrix}
+    = -F(x,\lambda, s)
+\]
+where $J$ is the Jacobian of F. We use the notation $r_c$ and $r_b$ for the first two block rows in $F$
+\[
+    r_b = Ax - b, \qquad    r_c = A^T\lambda + s -c \tag{14.7}\label{ipm: 14.7}
+\]
+we can write the Newton equations as follows:
+\[
+    \begin{bmatrix}
+        & 0 & A^T & I & \\
+        & A & 0 & 0 & \\
+        & S & 0 & X
+    \end{bmatrix}
+    \begin{bmatrix}
+        & \Delta x &\\
+        & \Delta \lambda & \\
+        & \Delta s &
+    \end{bmatrix} =
+    \begin{bmatrix}
+        & -r_c &\\
+        & -r_b & \\
+        & -XSe &
+    \end{bmatrix}\tag{14.8}\label{ipm: 14.8}
+\]
+Usually, a full step along this direction would violate the bound $(x, s) \geq 0$, so we perform a line search
+along the Newton direction and define the new iterate as
+\[
+    (x, \lambda,s)  + \alpha(\Delta x, \Delta \lambda, \Delta s)
+\]
+for some line search parameter $\alpha \in (0, 1]$.We often can take only a small step alone this direction $(\alpha \ll 1)$
+before violation the condition $(s,x) > 0$.Hence the pure Newton direction\eqref{ipm: 14.8} sometimes known as the
+\textit{affine scaling direction }, often does not allow us to make much progress toward a solution.
+\par Most primal-dual methods use a less aggressive Newton direction, one that does not aim directly for a solution
+of\eqref{KKT: 14.3a},\eqref{KKT: 14.3b},\eqref{KKT: 14.3c} but rather for a point whose pairwise products $x_i s_i$ are
+reduced to a lower average value \textemdash not all the way to zero.Specifically, we take a Newton step toward a point
+for which $x_i s_i = \sigma \mu$, where $\mu$ is the current duality measure and $\sigma \in [0, 1] $ is the reduction
+factor that we wish to achieve in the duality measure on this step.The modified step equation is then
+\[
+    \begin{bmatrix}
+        & 0 & A^T & I & \\
+        & A & 0 & 0 & \\
+        & S & 0 & X
+    \end{bmatrix}
+    \begin{bmatrix}
+        & \Delta x &\\
+        & \Delta \lambda & \\
+        & \Delta s &
+    \end{bmatrix} =
+    \begin{bmatrix}
+        & -r_c &\\
+        & -r_b & \\
+        & -XSe + \sigma\mu e &
+    \end{bmatrix}\tag{14.9}\label{ipm: 14.9}
+\]
+We call $\sigma $ the \textit{centering parameter}, for reasons to be discussed below.When $\sigma > 0 $, it
+usually is possible to take a longer step $\alpha$ along the direction before violating the bounds $(x, s)\geq 0$.
+\begin{algorithm}
+
+    \caption*{\textbf{Framework 14.1} \textit{(Primal-Dual-Path-Following)}}
+
+    \begin{algorithmic}
+%        \STATE \textbf{Framework 14.1} \textit{(Primal-Dual-Path-Following)}\\
+        \STATE \textbf{Given} $(x^0, \lambda^0, s^0)$ with $(x^0, s^0) > 0;$\\
+        \STATE \textbf{for} $k = 0, 1, 2, \cdots$ \\
+
+        \STATE Choose $\sigma_k \in [0,1] $ and solve
+
+
+    \end{algorithmic}
+\end{algorithm}
+
+Framework 14.1 (Primal-Dual-Path-Following)
+\begin{align*}
+    \text{Given } (x^0, \lambda^0, s^0) \text{with } \\
+    \text{for }  \\
+    \quad \text{Choose } \sigma_k \in [0,1] \text{ and solve }
+\end{align*}
+The choices of centering parameter $\sigma_k$ and step length $\alpha_k$ are crucial to the performance of the method.
+Techniques for controlling these parameters, directly and indirectly, give rise to a wide variety of methods with diverse
+properties.
+\par To begin our discussion and analysis of feasible interior-point methods, we introduce the concept of the \textit{central path}
+and then describe neighborhoods of this path.
+
+\subsubsection{The Central Path}
+The primal-dual \textit{feasible set $\mathcal{F} $ } and \textit{strictly feasible set $\mathcal{F}^0 $ } are defined as
+follows:
+\begin{align}
+    \mathcal{F} = \{(x, \lambda, s)| Ax = b, A^T\lambda + s = c, (x, s) \geq 0 \}  \tag{14.12a}\label{ipm: 14.12a} \\
+    \mathcal{F}^0 = \{(x, \lambda, s)| Ax = b, A^T\lambda + s = c, (x, s) > 0 \}  \tag{14.12b}\label{ipm: 14.12b}
+\end{align}
+The central path $\mathcal{C} $ is an arc of strictly feasible points that plays a vital role in primal-dual algorithms.
+It is parametrized by a scalar $\tau > 0$, and each point $(x_\tau, \lambda_\tau, s_\tau) \in \mathcal{C}$ satisfies
+the following equations:
+\begin{align}
+    A^T\lambda + s &= c \tag{14.13a}\label{KKT: 14.13a}\\
+    Ax & = b \tag{14.13b}\label{KKT: 14.13b}\\
+    x_i s_i & = \tau, \quad i = 1,2,\cdots, n \tag{14.13c} \label{KKT: 14.13c}\\
+    (x, s) & \geq 0 \tag{14.13d}\label{KKT: 14.13d}
+\end{align}
+These conditions differ from the KKT conditions only in the term $\tau $ on the right-hand side of\eqref{KKT: 14.13c}.
+Instead of the complementarity condition\eqref{KKT: 14.3c}, we require that the pairwise product $x_i s_i$ have the same
+positive value for all indices $i $.From (14.13), we can define the central path as
+\[
+    \mathcal{C} = \{(x_\tau, \lambda_\tau, s_\tau) | \tau > 0 \}
+\]
+It can be shown that $(x_\tau, \lambda_\tau, s_\tau)$ is defined uniquely for each $\tau > 0$  if and only if
+$\mathcal{F}^0$ is nonempty.
+\par The conditions (14.13) are also the optimality conditions for a logarithmic-barrier formulation of
+the problem (14.1).By introducing log barrier terms for the non-negativity constraints, with barrier parameter $\tau > 0$,
+we obtain
+\[
+    \min c^T x - \tau \sum_{i = 1}^n \ln x_i, \qquad \text{ subject to } Ax = b \tag{14.14}\label{ipm: 14.14}
+\]
+The KKT conditions with Lagrange multiplier $\lambda $ for the equality constraint are
+\[
+    c_i - \frac{\tau}{x_i} - A_i^T \lambda = 0, \quad i = 1,2,\cdots, n, \quad Ax = b
+\]
+Since the objective is strictly convex, these conditions are sufficient as well as necessary for optimality.
+We recover(14.13) by defining $s_i = \tau/ x_i, \quad i = 1,2,\cdots, n$
+\par Another way of defining $\mathcal{C}$ is to use the mapping $F$ defined in (14.4) and write
+\[
+    F(x_\tau, \lambda_\tau, s_\tau) =
+    \begin{bmatrix}
+        & 0 & \\
+        & 0 & \\
+        & \tau e &
+    \end{bmatrix},
+    (x_\tau, s_\tau) > 0\tag{14.15}\label{ipm: 14.15}
+\]
+
+The equations(14.13) approximate (14.3) more and more closely as $\tau$ goes to zero.If $\mathcal{C}$ converges
+to anything as $ \tau \xrightarrow{ }  0$, it must converge to a primal-dual solution of the linear program.The central path
+thus guides us to a solution along a route that maintains positivity of the $x$ and $s$ components and decreases the pairwise products $x_i s_i$ to zero at the same rate.
+Most primal-dual algorithms take Newton steps toward points in $\mathcal{C}$ for which $\tau > 0$, rather than pure
+Newton steps for $F$.Since these steps are biased toward the interior of the non-negative orthant defined by $(x, s)\geq 0$,
+it usually is possible to take longer steps along them than along the pure Newton (affine scaling) steps, before violating the
+positivity condition.
+\par In the feasible case of $(x, \lambda, s)\in\mathcal{F} $, we have $r_b = 0$ and $r_c = 0$, so the search direction
+satisfies a special case of (14.8), that is
+\[
+    \begin{bmatrix}
+        & 0 & A^T & I & \\
+        & A & 0 & 0 & \\
+        & S & 0 & X
+    \end{bmatrix}
+    \begin{bmatrix}
+        & \Delta x &\\
+        & \Delta \lambda & \\
+        & \Delta s &
+    \end{bmatrix} =
+    \begin{bmatrix}
+        & 0 &\\
+        & 0 & \\
+        & -XSe + \sigma\mu e &
+    \end{bmatrix}\tag{14.16}\label{ipm: 14.16}
+\]
+when $\sigma = 1 $, the equations\eqref{ipm: 14.16} define a \textit{centering direction}, a Newton step toward the point
+$(x_\mu, \lambda_\mu, s_\mu)\in\mathcal{C} $, at which all the pairwise products $x_i s_i$ are identical to the current
+average value of $\mu$.Centering directions are usually biased strongly toward the interior of the non-negative orthant and make little
+progress in reducing the duality measure $\mu$.However byu moving closer to $\mathcal{C} $, they set the scene for a substantial
+reduction in $\mu$ on the next iteration.At the other extreme, the value $\sigma = 0$ gives the standard Newton (affine scaling) step.
+Many algorithms use intermediate values of $\sigma $ from the open interval $(0, 1)$ to trade off between the twin goals of
+reducing $\mu$ and improving centrality.
+
+\subsubsection{Central Path Neighborhoods and Path Following Methods}
+The two most interesting neighborhoods of $\mathcal{C}$ are
+\begin{align}
+    \mathcal{N}_2(\theta) = \{(x, \lambda, s)\in\mathcal{F}^0 | \Vert XSe - \mu e \Vert_2 \leq \theta\mu \} , \quad \theta\in [0, 1) \tag{14.17}\label{ipm: 14.17}\\
+        \mathcal{N}_{-\infty}(\gamma) = \{(x, \lambda, s)\in\mathcal{F}^0 | x_i s_i\geq\gamma\mu \forall i = 1,2,\cdots,n  \} , \quad \gamma\in [0, 1) \tag{14.18}\label{ipm: 14.18}
+\end{align}
+Typical values of the parameters are $\theta = 0.5$ and $\gamma = 10^{-3}$.The algorithm we specify below, a special case
+of Framework 14.1 is known as a \textit{long-step path-following algorithm}.This algorithm can make rapid progress because of
+its use of the wide neighborhood $\mathcal{N}_{-\infty}(\gamma)$, for $\gamma$ close to zero.It depends on two parameters
+$\sigma_{\min}$ and $\sigma_{\max}$, which are lower and upper bounds on the centering parameter $\sigma_k$.
+\par Here and in later analysis, we use the notation
+\[
+    (x^k(\alpha), \lambda^k(\alpha), s^k(\alpha)) = ()
+\]
+
+\subsection{Practical Primal-Dual Algorithms} \label{subsec:-practical-primal-dual-algorithms}

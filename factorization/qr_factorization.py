@@ -15,7 +15,7 @@ def qr_fact(a):
         a = a.T
         m, n = a.shape
     q, r = np.linalg.qr(a.T, mode='complete')
-    np.allclose(q.dot(r), a.T)  # a1 dot a2 restores the matrix A.T
+    # np.allclose(q.dot(r), a.T)  # a1 dot a2 restores the matrix A.T
     y = q[:, :m]
     z = q[:, m:]
     r = r[:m, :]
