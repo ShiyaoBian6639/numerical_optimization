@@ -32,3 +32,9 @@ x = m.addMVar(n, lb=0.0)
 m.setObjective(x @ q @ x + p @ x, GRB.MINIMIZE)
 m.addConstr(A @ x == 1)
 m.optimize()
+count = 0
+temp = np.zeros(n)
+for i in range(n):
+    if x[i].x > 1e-4:
+        temp[i] = x[i].x
+x = temp.copy()
