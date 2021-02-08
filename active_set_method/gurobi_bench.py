@@ -29,7 +29,7 @@ q, p, x = generate_random_instance(n)
 m = Model('portfolio')
 A = np.ones(n)
 x = m.addMVar(n, lb=0.0)
-m.setObjective(x @ q @ x + p @ x, GRB.MINIMIZE)
+m.setObjective(x @ q @ x + 2 * p @ x, GRB.MINIMIZE)
 m.addConstr(A @ x == 1)
 m.optimize()
 count = 0
@@ -38,3 +38,7 @@ for i in range(n):
     if x[i].x > 1e-4:
         temp[i] = x[i].x
 x = temp.copy()
+
+shit = np.vstack((x, y))
+
+gurobi_obj = .5 * x @ q @ x + p @ x

@@ -4,7 +4,7 @@ Active set method  solves linearly  constrained  general quadratic program
 import numpy as np
 from numba import njit, int64
 from matplotlib import pyplot as plt
-from factorization.qr_factorization import qr_fact, qr_update
+from factorization.qr_factorization import qr_fact
 from factorization.cholesky_factorization import cholesky_solve
 
 TOLERANCE = 1e-10
