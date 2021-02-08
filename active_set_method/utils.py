@@ -94,7 +94,7 @@ def qp_econ_null_space(a, x, b, G, c):
     pz_lhs = np.dot(np.dot(z.T, G), z)
     pz = cholesky_solve(pz_lhs, pz_rhs)
     p = y.dot(py) + z.dot(pz)
-    lmd_left = np.dot(inv_ay.T, y.T) # use sparse lower triangular solve instead for efficiency
+    lmd_left = np.dot(inv_ay.T, y.T)  # use sparse lower triangular solve instead for efficiency
     lmd_right = g + G.dot(p)
     lmd = lmd_left.dot(lmd_right)
     return p + x, lmd
@@ -114,7 +114,7 @@ def get_max_multiplier(u, num_con, active_set, active_set_bool):
     max_index = -1
     for i in range(num_con, len(u)):
         val = u[i]
-        if val > 0 and val > max_multiplier and active_set_bool[active_set[i - num_con]]:
+        if val > 0 and val > max_multiplier and active_set_bool[active_set[i - num_con]] == 0:
             max_multiplier = val
             max_index = i
     return max_index - num_con
@@ -205,48 +205,6 @@ def my_floor(a, precision=0):
     :return:
     """
     return np.round(a - 0.5 * 10 ** (-precision), precision)
-
-
-# @njit()
-def active_set_method(q, p, x, a):
-    eig_val, eig_mat = np.linalg.eig(q)
-    if min(eig_val) < 0:
-        print("problem is not positive semi definite")
-        return 0, 0, 0
-    original_constraint = a.copy()
-    inv_q = np.linalg.inv(q)
-    num_con = len(a)
-    active_set, a, b = get_econ(original_constraint, x)  # active set of current solution
-    active_set_bool = get_active_set_bool(active_set, x)
-    step_count = 0
-    obj_list = []
-    while True:
-        sub_p = p + np.dot(q, x)  # solve sub problem
-        d, u = qp_econ(inv_q, sub_p, a, b)
-        # d, u = qp_econ_null_space(a, x, b, q, sub_p)
-        step_count += 1
-        # print(f"step_count is {step_count}")
-        direction_norm = np.linalg.norm(d)
-        # print(f"direction norm: {direction_norm}")
-        if direction_norm < TOLERANCE:
-            max_multiplier = get_max_multiplier(u, num_con, active_set, active_set_bool)
-            if max_multiplier < 0:
-                return x, step_count, np.array(obj_list)
-            else:  # update the active set
-                active_set, a, b, active_set_bool = drop_active_set(active_set, a, b, max_multiplier, num_con,
-                                                                    active_set_bool)
-        else:  # compute the step length
-            step_length, append_index = compute_step_length(x, d, active_set_bool)
-            # print(f"step length is {step_length}")
-            x += step_length * d
-            minx = min(x)
-            if append_index >= 0:  # append new element "append_index" to the current active set
-                active_set, a, b, active_set_bool = append_active_set(active_set, a, b, append_index, active_set_bool)
-
-            obj = 0.5 * np.dot(np.dot(x.T, q), x) + np.dot(p, x)
-            print(obj)
-            obj_list.append(obj)
-        print(f"sum x: {x.sum()}")
 
 
 def plot_obj(arr):

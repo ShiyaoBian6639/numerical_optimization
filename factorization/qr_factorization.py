@@ -5,6 +5,7 @@ R: upper triangular matrix
 """
 import numpy as np
 
+
 # m, n = 10, 14
 # A = np.random.random((m, n))
 
@@ -22,5 +23,9 @@ def qr_fact(a):
     return y, z, r
 
 
-def qr_update():
+def qr_update_add():
+    pass
+
+
+def qr_update_remove():
     pass
