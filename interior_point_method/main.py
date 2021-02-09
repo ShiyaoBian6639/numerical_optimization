@@ -1,5 +1,5 @@
 import numpy as np
-from interior_point_method.utils import ipm_initial_feasible, dakota_instance, naive_newton_step, step_length
+from interior_point_method.utils import ipm_initial_feasible, dakota_instance, predictor_step, step_length
 
 A, b, c, var_ind = dakota_instance()  # generate instance
 m, n = A.shape
@@ -9,7 +9,7 @@ x, s, X, S, e, mu, lmd = ipm_initial_feasible(A, b, c)
 
 sigma = 0.5  # duality decrement rate
 
-delta_x, delta_lmd, delta_s = naive_newton_step(A, b, c, x, s, lmd, X, S, e, sigma)
+delta_x, delta_lmd, delta_s = predictor_step(A, b, c, x, s, lmd, X, S, e, sigma)
 
 alpha = step_length(x, s, delta_x, delta_s) / 2
 # update

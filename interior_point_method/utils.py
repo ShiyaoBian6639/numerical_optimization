@@ -44,7 +44,7 @@ def ipm_initial_feasible(a, b, c):
     return x, s, X, S, e, mu, lmd
 
 
-def naive_newton_step(A, b, c, x, s, lmd, X, S, e, sigma):
+def predictor_step(A, b, c, x, s, lmd, X, S, e, sigma):
     m, n = A.shape
     I = np.eye(n)
     jacobian_dim = 2 * n + m
@@ -59,7 +59,7 @@ def naive_newton_step(A, b, c, x, s, lmd, X, S, e, sigma):
     duality_measure = x.dot(s) / n
     rb = A.dot(x) - b
     rc = np.dot(A.T, lmd) + s - c
-    comp_slack = np.dot(X.dot(S), e) - sigma * duality_measure * e
+    comp_slack = np.dot(X.dot(S), e)  # - sigma * duality_measure * e
     f = np.zeros(jacobian_dim)
     f[:m] = -rb
     f[m:(m + n)] = -rc
@@ -69,7 +69,13 @@ def naive_newton_step(A, b, c, x, s, lmd, X, S, e, sigma):
     delta_x = step[:n]
     delta_lmd = step[n:(m + n)]
     delta_s = step[(m + n):]
-    return delta_x, delta_lmd, delta_s
+    return delta_x, delta_lmd, delta_s, inv_jacobian
+
+
+def corrector_step(delta_x, delta_s, inv_jacobian, ):
+    jacobian_dim = inv_jacobian
+
+    pass
 
 
 def step_length(x, s, delta_x, delta_s):
