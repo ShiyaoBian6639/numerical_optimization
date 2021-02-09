@@ -238,3 +238,52 @@ $\sigma_{\min}$ and $\sigma_{\max}$, which are lower and upper bounds on the cen
 \]
 
 \subsection{Practical Primal-Dual Algorithms} \label{subsec:-practical-primal-dual-algorithms}
+\textbf{Corrector and Centering Steps}
+A key feature of practical algorithm is their use of corrector steps that compensate for the linearization error made by
+the Newton step in modeling the equation $x_i s_i = 0, \quad i = 1,2,\cdots, n$.Consider the affine-scaling direction
+$\Delta x, \Delta \lambda, \Delta s $ defined by
+\[
+    \begin{bmatrix}
+        & 0 & A^T & I & \\
+        & A & 0 & 0 & \\
+        & S & 0 & X
+    \end{bmatrix}
+    \begin{bmatrix}
+        & \Delta x^{\text{aff}} &\\
+        & \Delta \lambda^{\text{aff}} & \\
+        & \Delta s^{\text{aff}} &
+    \end{bmatrix} =
+    \begin{bmatrix}
+        & -r_c &\\
+        & -r_b & \\
+        & -XSe  &
+    \end{bmatrix}\tag{14.30}\label{ipm: 14.30}
+\]
+If we take a full step in this direction, we obtain
+\[
+    (x_i + \Delta x_i^{\text{aff}})(s_i + \Delta s_i^{\text{aff}})\\
+    = x_i s_i + x_i \Delta s_i^{\text{aff}} + s_i \Delta x_i^{\text{aff}} + \Delta x_i^{\text{aff}}\Delta s_i^{\text{aff}}
+\]
+That is, the updated value of $x_i s_i$ is $\Delta x_i^{\text{aff}}\Delta s_i^{\text{aff}}$ rather than the ideal value 0.
+We can solve the following system to obtain a step $(\Delta x^{\text{cor}}, \Delta\lambda^{\text{cor}}, \Delta s^{\text{cor}})$ that \
+attempts to correct for this deviation from the ideal:
+\[
+    \begin{bmatrix}
+        & 0 & A^T & I & \\
+        & A & 0 & 0 & \\
+        & S & 0 & X
+    \end{bmatrix}
+    \begin{bmatrix}
+        & \Delta x^{\text{cor}} &\\
+        & \Delta \lambda^{\text{cor}} & \\
+        & \Delta s^{\text{cor}} &
+    \end{bmatrix} =
+    \begin{bmatrix}
+        & 0 &\\
+        & 0 & \\
+        & -\Delta X^{\text{aff}}\Delta S^{\text{aff}} e  &
+    \end{bmatrix}\tag{14.31}\label{ipm: 14.31}
+\]
+In many cases, the combined step $(\Delta x^{\text{aff}}, \Delta\lambda^{\text{aff}}, \Delta s^{\text{aff}})$ +
+$(\Delta x^{\text{cor}}, \Delta\lambda^{\text{cor}}, \Delta s^{\text{cor}})$
+does a better job of reducing the duality measure than does the affine scaling step alone.
