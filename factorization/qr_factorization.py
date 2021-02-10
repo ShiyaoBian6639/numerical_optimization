@@ -23,7 +23,10 @@ def qr_fact(a):
     return y, z, r
 
 
-def qr_update_add():
+def qr_update_add(q1, q2, r, a):
+    n = r.shape[0]
+    r_update = np.empty((n, n))
+    # r_update[:n,]
     pass
 
 

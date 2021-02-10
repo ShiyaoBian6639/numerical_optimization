@@ -1,0 +1,36 @@
+\subsection{Householder and Givens Transformations}\label{subsec:-householder-givens-transformations}
+$Q\in\mathbb{R}^{m\times m} $ is orthogonal if
+\[
+    Q^T Q = Q Q^T = I_m
+\]
+A $2\times 2$ orthogonal matrix $Q$ is a \textit{rotation} if it has the form
+\[
+    Q =
+    \begin{bmatrix}
+        & \cos(\theta) & \sin (\theta) &\\
+        & -\sin(\theta) & \cos(\theta) &
+    \end{bmatrix}
+\]
+If $ y = Q^T x $, then $y$ is obtained by rotating $x$ counterclockwise through an angle $\theta$.
+\par A $2\times 2$ orthogonal matrix $Q$ is a \textit{reflection} if it has the form
+\[
+    Q =
+    \begin{bmatrix}
+        & \cos(\theta) & \sin (\theta) &\\
+        & \sin(\theta) & -\cos(\theta) &
+    \end{bmatrix}
+\]
+If $ y = Q^T x = Qx$, then $y$ is obtained by reflecting the vector $x$ across the line defined by
+\[
+    S = \cos{\frac{\theta}{2}}, \sin{\frac{\theta}{2}}
+\]
+Reflections and rotations are computationally attractive because they are easily constructed and because they can be
+used to introduce zeros in a vector by properly choosing the rotation angle or the reflection plane.
+
+\subsubsection{Householder Reflections}\label{subsubsec:-househoulder-reflection}
+Let $v\in\mathbb{R}^m$ be nonzero. An $m\times m $ matrix $P$ of the form
+\[
+    P = I - \beta vv^T, \beta = \frac{2}{v^T v}
+\]
+is a Householder reflection.The vector $v$ is the \textit{Householder vector}.If a vector $x$ is multiplied by $P$, then
+it is reflected in the hyperplane \textbf{span}$\{v\}$.Householder matrices are symmetric and orthogonal.
