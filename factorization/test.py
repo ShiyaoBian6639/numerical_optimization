@@ -1,4 +1,4 @@
-from factorization.qr_factorization import qr_fact, qr_update_add, qr_update_remove
+from factorization.qr_factorization import qr_fact, qr_add_row, qr_drop_row
 import numpy as np
 
 m, n = 5, 14
@@ -8,12 +8,16 @@ for i in range(1, m):
     A[i, i - 1] = 1
 q1, q2, r = qr_fact(A)
 # test qr update
-a = np.zeros((1, n))
-a[0, 4] = 1
-_A = np.vstack((A, a))
+a = np.zeros((n, 1))
+a[4, 0] = 1
+_A = np.vstack((A, a.T))
 q1_ben, q2_ben, r_ben = qr_fact(_A)
 
 # update procedure
-q1at = np.dot(q1.T, a.T)  # m * 1
-q2at = np.dot(q2.T, a.T)  # (n - m) * 1
-gamma = np.linalg.norm(q2at)
+q1_add, q2_add, r_add = qr_add_row(q1, q2, r, a)
+print(np.allclose(q1_ben, q1_add))
+print(np.allclose(q2_ben, q2_add))
+print(np.allclose(r_ben, r_add))
+
+%timeit q1_ben, q2_ben, r_ben = qr_fact(_A)
+%timeit q1_add, q2_add, r_add = qr_add_row(q1, q2, r, a)
