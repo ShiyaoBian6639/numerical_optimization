@@ -4,7 +4,7 @@ Q: orthogonal matrix
 R: upper triangular matrix
 """
 import numpy as np
-from matrix_computations.householder_reflection import unit_transformation
+from matrix_computations.orthogonalization import unit_transformation, givens_rotation
 from numba import njit
 
 
@@ -22,7 +22,7 @@ def qr_fact(a):
     y = q[:, :m]
     z = q[:, m:]
     r = r[:m, :]
-    return y, z, r
+    return q, y, z, r
 
 
 @njit()
@@ -45,5 +45,15 @@ def qr_add_row(q1, q2, r, a):
     return q1_update, q2_update[:, 1:(n - m)], r_update
 
 
-def qr_drop_row():
-    pass
+@njit()
+def qr_drop_row(q_pre, a_drop, index):
+    r = np.dot(q_pre.T, a_drop.T)
+    for i in range(index, r.shape[1]):
+        a = r[i, i]
+        b = r[i + 1, i]
+        rotation_matrix = givens_rotation(a, b)
+        r_tmp = r[i:(i + 2), :]
+        r[i:(i + 2), :] = rotation_matrix.dot(r_tmp)
+        q_tmp = q_pre[:, i:(i + 2)]
+        q_pre[:, i:(i + 2)] = q_tmp.dot(rotation_matrix.T)
+    return r

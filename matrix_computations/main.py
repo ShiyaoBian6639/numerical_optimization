@@ -1,4 +1,4 @@
-from matrix_computations.householder_reflection import householder_reflection, unit_transformation
+from matrix_computations.orthogonalization import householder_reflection, unit_transformation
 import numpy as np
 
 n = 100
