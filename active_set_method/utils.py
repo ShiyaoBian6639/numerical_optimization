@@ -4,7 +4,7 @@ Active set method  solves linearly  constrained  general quadratic program
 import numpy as np
 from numba import njit, int64
 from matplotlib import pyplot as plt
-from factorization.qr_factorization import qr_fact
+from factorization.qr_factorization import qr_fact, qr_add_row, qr_drop_row
 from factorization.cholesky_factorization import cholesky_solve
 
 TOLERANCE = 1e-10
@@ -99,6 +99,27 @@ def qp_econ_null_space(a, x, b, G, c):
     lmd = lmd_left.dot(lmd_right)
     return p + x, lmd
 
+
+def qp_econ_null_space_update(a, y, z, r, x, b, G, c):
+    h = a.dot(x) - b
+    g = c + G.dot(x)
+    # y, z, r = qr_fact(a)
+    m, n = a.shape
+    if m < n:
+        inv_ay = np.linalg.inv(a.dot(y))
+    else:
+        inv_ay = np.linalg.inv(a.dot(y.T))
+    py = -np.dot(inv_ay, h)
+    pz_rhs = -np.dot(np.dot(np.dot(z.T, G), y), py) - np.dot(z.T, g)
+    pz_lhs = np.dot(np.dot(z.T, G), z)
+    pz = cholesky_solve(pz_lhs, pz_rhs)
+    p = y.dot(py) + z.dot(pz)
+    lmd_left = np.dot(inv_ay.T, y.T)  # use sparse lower triangular solve instead for efficiency
+    lmd_right = g + G.dot(p)
+    lmd = lmd_left.dot(lmd_right)
+    return p + x, lmd
+
+# def qp_econ_null_space_drop
 
 # @njit()
 def get_max_multiplier(u, num_con, active_set, active_set_bool):
