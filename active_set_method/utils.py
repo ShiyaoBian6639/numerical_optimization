@@ -94,7 +94,7 @@ def qp_econ_null_space(a, x, b, G, c):
     pz_lhs = np.dot(np.dot(z.T, G), z)
     pz = cholesky_solve(pz_lhs, pz_rhs)
     p = y.dot(py) + z.dot(pz)
-    lmd_left = np.dot(inv_ay.T, y.T)  # use sparse lower triangular solve instead for efficiency
+    lmd_left = np.dot(inv_ay.T, y.T)
     lmd_right = g + G.dot(p)
     lmd = lmd_left.dot(lmd_right)
     return p + x, lmd
@@ -108,27 +108,7 @@ def qp_econ_factor(a, y, z, r, x, b, G, c):
         inv_ay = np.linalg.inv(a.dot(y))
     else:
         inv_ay = np.linalg.inv(a.dot(y.T))
-    py = -np.dot(inv_ay, h)
-    pz_rhs = -np.dot(np.dot(np.dot(z.T, G), y), py) - np.dot(z.T, g)
-    pz_lhs = np.dot(np.dot(z.T, G), z)
-    pz = cholesky_solve(pz_lhs, pz_rhs)
-    p = y.dot(py) + z.dot(pz)
-    lmd_left = np.dot(inv_ay.T, y.T)  # use sparse lower triangular solve instead for efficiency
-    lmd_right = g + G.dot(p)
-    lmd = lmd_left.dot(lmd_right)
-    return p + x, lmd
-
-
-def qp_econ_null_space_update(a, y, z, r, x, b, G, c):
-    h = a.dot(x) - b
-    g = c + G.dot(x)
-    # y, z, r = qr_fact(a)
-    m, n = a.shape
-    if m < n:
-        inv_ay = np.linalg.inv(a.dot(y))  # a.dot(y) = r.T ! can solve inv_ay in O(n^2) time !
-    else:
-        inv_ay = np.linalg.inv(a.dot(y.T))
-    py = -np.dot(inv_ay, h)
+    py = -np.dot(inv_ay, h)  # use sparse lower triangular solve instead for efficiency
     pz_rhs = -np.dot(np.dot(np.dot(z.T, G), y), py) - np.dot(z.T, g)
     pz_lhs = np.dot(np.dot(z.T, G), z)
     pz = cholesky_solve(pz_lhs, pz_rhs)

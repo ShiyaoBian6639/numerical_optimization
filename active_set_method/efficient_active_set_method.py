@@ -58,6 +58,7 @@ def active_set_method(q, p, x, a):
     x, step_count, obj_list = active_set_update(q, p, x, a, y, z, r, b, num_con, active_set, active_set_bool)
     return x, step_count, obj_list
 
+
 def active_set_update(q, p, x, a, y, z, r, b, num_con, active_set, active_set_bool):
     step_count = 0
     obj_list = []

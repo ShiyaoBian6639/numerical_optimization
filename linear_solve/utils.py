@@ -4,7 +4,7 @@ from numba import njit
 
 # solves linear system exploiting sparsity
 @njit()
-def lower_triangular_solve(indices, ind_ptr, data, b):
+def sparse_lower_triangular_solve(indices, ind_ptr, data, b):
     """
     solves lx = b, where l is a sparse lower triangular matrix
     :param indices: column indices of l
@@ -28,3 +28,12 @@ def lower_triangular_solve(indices, ind_ptr, data, b):
         row_count += 1
     return x
 
+
+def dense_upper_triangular_solve(a, b):
+    """
+    solves ax = b
+    :param a: upper triangular matrix
+    :param b: right-hand-side
+    :return:
+    """
+    pass

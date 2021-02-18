@@ -19,7 +19,7 @@ c = np.array([-8, -3, -3])
 G = np.array([[6, 2, 1], [2, 5, 2], [1, 2, 4]])
 # large instance test
 
-n = 400
+n = 1000
 q, p, y = generate_random_instance(n)
 q = q + 2 * np.eye(n)
 y = np.random.random(n)
