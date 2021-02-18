@@ -35,4 +35,3 @@ r_drop = qr_drop_row(q, _A, 1)
 #     [4, 2, 0],
 #     [3, 4, 0],
 # ], dtype=float)
-

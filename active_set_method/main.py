@@ -1,6 +1,6 @@
 from active_set_method.utils import generate_random_instance
 from active_set_method.naive_active_set_method import naive_active_set_method
-from active_set_method.efficient_active_set_method import efficient_active_set_method
+from active_set_method.efficient_active_set_method import active_set_method
 import numpy as np
 from active_set_method.utils import plot_obj
 from gurobipy import Model, GRB
@@ -26,7 +26,7 @@ y = np.random.random(n)
 y = y / y.sum()
 a = np.ones((1, n))
 # y, cnt, obj_list = naive_active_set_method(q, p, y, a)
-y_eff, cnt_eff, obj_list_eff = efficient_active_set_method(q, p, y, a)
+y_eff, cnt_eff, obj_list_eff = active_set_method(q, p, y, a)
 print(obj_list_eff[-1])
 plot_obj(obj_list_eff)
 # for i in range(n):

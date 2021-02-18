@@ -10,7 +10,9 @@ from numba import njit
 
 # m, n = 10, 14
 # A = np.random.random((m, n))
-
+@njit()
+def matrix_dot(a):
+    return a.dot(a.T)
 
 def qr_fact(a):
     m, n = a.shape
@@ -27,6 +29,14 @@ def qr_fact(a):
 
 @njit()
 def qr_add_row(q1, q2, r, a):
+    """
+    appending a column 'a' on matrix
+    :param q1:
+    :param q2:
+    :param r:
+    :param a:
+    :return:
+    """
     n, m = q1.shape
     q1t_a = np.dot(q1.T, a)
     q2t_a = np.dot(q2.T, a)
